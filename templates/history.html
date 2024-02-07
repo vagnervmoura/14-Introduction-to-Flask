@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div style="text-align: center">
+        <br><br><h4>HISTORY</h4>
+    </div>
+
+    <div class="mb-3">
+        <div class="col col-6 container-fluid">
+            <table class="table table-dark table-sm">
+                <thead>
+                    <tr><br><br>
+                        <th>Start Date:</th>
+                        <th>End Date:</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input id="startDate" name="startDate" type="date" class="form-control"></td>
+                        <td><input id="endDate" name="endDate" type="date" class="form-control"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="submit" class="custom-button">Submit</button>
+
+            <table class="table table-dark table-sm">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>DATE</th>
+                        <th>ACTION</th>
+                        <th>VALUE</th>
+                    </tr>
+                </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>2024/01/29 13:08:05</td>
+                            <td>Add Balance</td>
+                            <td>100.00</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>2024/01/29 13:09:08</td>
+                            <td>Purchasing 2 units of book</td>
+                            <td>8.00</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>2024/01/29 13:10:36</td>
+                            <td>Purchasing 3 units of Pen</td>
+                            <td>27.00</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>2024/01/29 13:10:36</td>
+                            <td>Selling 1 units of book</td>
+                            <td>9.00</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>2024/01/29 13:10:36</td>
+                            <td>Withdraw from Balance</td>
+                            <td>20.00</td>
+                        </tr>
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

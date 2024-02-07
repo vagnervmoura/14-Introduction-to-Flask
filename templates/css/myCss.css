@@ -1,0 +1,32 @@
+@charset "utf-8";
+/* CSS Document */
+
+.fonts {
+	font-family: "Times New Roman", Times, serif;
+	font-size: 14px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: bold;
+	font-variant: normal;
+	color: #FFF;
+}
+
+body{
+	background-image:url(../img/backGround.png);
+	color: #FFF;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.menu {
+	background-image:url(../img/backGround.png);
+	color: #FFF;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.top {
+	background-color:#F2F2F2;
+	color: #FFF;
+	font-size: 14px;
+	font-weight: bold;

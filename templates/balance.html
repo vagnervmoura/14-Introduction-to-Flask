@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div style="text-align: center">
+        <br><br><h4>BALANCE</h4>
+    </div>
+
+        <div class="row mt-3">
+        <div class="col col-6 container-fluid">
+            <form action="#">
+                <div class="mb-3">
+                    <label for="balance" class="form-label">Insert the amount:</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">€</span>
+                        <input type="text" class="form-control" aria-label="Amount (to the nearest Euro)" id="v_balance" required="required">
+                        <span class="input-group-text">.00</span>
+                    </div>
+                </div>
+                <button type="submit" class="custom-button">Lodgement</button>
+                <button type="submit" class="custom-button">Withdraw</button>
+                <!-- <button class="custom-button" onclick="alert('Button clicked!')">Click me</button>
+                <button class="custom-button" disabled>Disabled Button</button> -->
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
