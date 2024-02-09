@@ -8,20 +8,20 @@
 
     <div class="row mt-3">
         <div class="col col-6 container-fluid">
-            <form action="#">
+            <form action="/purchase/", method="POST">
                 <div class="mb-3"><br><br>
                     <label for="productName" class="form-label">Product name:</label>
-                    <input type="text" class="form-control" id="v_name" required>
+                    <input id="v_name" name="v_name" type="text" class="form-control" required>
                 </div>
                 <div class="mb-3">
                     <label for="productQuantity" class="form-label">Quantity:</label>
-                    <input type="number" class="form-control" id="v_quantity" width="48" min="1" required="required">
+                    <input id="v_quantity" name="v_quantity" type="number" class="form-control" width="48" min="1" required>
                 </div>
                 <div class="mb-3">
                     <label for="productPrice" class="form-label">Price:</label>
                     <div class="input-group mb-3">
                         <span class="input-group-text">€</span>
-                        <input type="text" class="form-control" aria-label="Amount (to the nearest Euro)" id="v_price" required="required">
+                        <input id="v_price" name="v_price" type="text" class="form-control" aria-label="Amount (to the nearest Euro)" required="required">
                         <span class="input-group-text">.00</span>
                     </div>
                 </div>

@@ -2,11 +2,20 @@ import os
 import json
 import ast  # For literal_eval
 from datetime import datetime
+
+import app
 from config import Config
+#from app import purchase
+from flask import Flask
+from flask import render_template
+from flask import request
+from flask import redirect
+from flask import url_for
+from flask import flash
 
 
 class Manager:
-    def __init__(self, config_obj=None):
+    def __init__(self, name, config_obj=None):
         if config_obj is not None:
             self.balance_file = config_obj.balance_file
             self.warehouse_file = config_obj.warehouse_file
@@ -80,7 +89,6 @@ class Manager:
         v_balance = load_file(self.balance_file, 0)
         v_warehouse = load_file(self.warehouse_file, {})
         v_review = load_file(self.review_file, [])
-
         return {"v_balance": v_balance, "v_warehouse": v_warehouse, "v_review": v_review}
 
     def save_data(self, data):
@@ -122,7 +130,7 @@ class Manager:
         return data
 
 
-    @log_transaction
+#    @log_transaction
     def f_balance(self, data, *args, **kwargs):
         try:
             v_action = int(input("Press '1' to Add or press '2' to Subtract: "))
@@ -139,8 +147,8 @@ class Manager:
         return data
 
 
-    @log_transaction
-    @validate_quantity
+#    @log_transaction
+#    @validate_quantity
     def f_sale(self, data, *args, **kwargs):
         v_warehouse = data.get("v_warehouse", {})
 
@@ -166,31 +174,74 @@ class Manager:
         return data
 
 
-    @log_transaction
-    @validate_quantity
-    @validate_price
-    def f_purchase(self, data, *args, **kwargs):
-        actual_balance = data.get("v_balance", 0)
+#    @log_transaction
+#    @validate_quantity
+#    @validate_price
 
-        if actual_balance <= 0:
-            print("\nYour account is empty, and you cannot make any purchases.")
-            return data
 
-        try:
-            v_name = str(input("Insert the name of product: "))
-            v_price = float(input(f"Insert the unit price of {v_name}: "))
-            v_quantity = int(input(f"Insert the quantity of {v_name}: "))
-
+    def new_purchase(self, methods=["POST", "GET"]):
+        print("BEFORE")
+        if request.method == "POST":
+            form_values = request.form
+            new_data = {
+                "v_name": str(form_values["v_name"]),
+                "v_quantity": int(form_values["v_quantity"]),
+                "v_price": float(form_values["v_price"]),
+            }
+            v_name = new_data["v_name"]
+            v_quantity = new_data["v_quantity"]
+            v_price = new_data["v_price"]
             total_price = v_price
-            if total_price > actual_balance:
-                print(f"Sorry, you do not have a balance enough to make this purchase.\n"
-                      f"Your actual balance is {actual_balance}.")
-            else:
-                data = self.add_transaction(data, "purchase", total_price, v_name, v_quantity)
+            print(v_name)
+            print(v_quantity)
+            print(v_price)
 
-        except ValueError:
-            print("Sorry, you did not input a valid value.\n")
 
+
+        data = self.add_transaction(data,"purchase", total_price, v_name, v_quantity)
+
+
+
+
+
+    def f_purchase(self, new_data, *args, **kwargs):
+        config_obj = Config()
+        config_obj.create_files()
+        manager = Manager(config_obj)
+        data = Manager.load_data(self)
+        actual_balance = data.get("v_balance", 0)
+        print("****************************************TESTE*******************************************************")
+        #if actual_balance <= 0:
+        #    print("\nYour account is empty, and you cannot make any purchases.")
+        #    return data
+        #
+        #app.purchase()
+        print("BEFORE")
+        print(new_data)
+        v_name = new_data["v_name"]
+        v_quantity = new_data["v_quantity"]
+        v_price = new_data["v_price"]
+        total_price = v_price
+        print(v_name, v_price, v_quantity)
+
+        print(f"====================V_BALANCE: {data['v_balance']}")
+
+
+            # v_name = str(input("Insert the name of product: "))
+            # v_price = float(input(f"Insert the unit price of {v_name}: "))
+            # v_quantity = int(input(f"Insert the quantity of {v_name}: "))
+            #purchase()
+
+            #total_price = v_price
+            #if total_price > actual_balance:
+            #    print(f"Sorry, you do not have a balance enough to make this purchase.\n"
+            #          f"Your actual balance is {actual_balance}.")
+            #else:
+        data = self.add_transaction(data, "purchase", total_price, v_name, v_quantity)
+        print("AFTER")
+        #except ValueError:
+        #    print("Sorry, you did not input a valid value.\n")
+        print(data)
         return data
 
     def f_account(self, data):
