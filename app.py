@@ -17,20 +17,28 @@ from manager import Manager
 from config import Config
 
 db = Manager
+warehouse = Manager(name="warehouse_file")
 
 config_obj = Config()
 config_obj.create_files()
 manager = Manager(config_obj)
 
 data = manager.load_data()
+
 new_data = {}
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "mySecretKey"
 @app.route("/")
 def index():
-    print(f">>>>>>>>> INDEX: {data}")
-    return render_template("index.html", title="Vignoto - Accounting and Management System")
+    data = manager.load_data()
+    stock = data["v_warehouse"]
+    # for stock in warehouse:
+    #     print(stock)
+    #     print(warehouse[stock]['v_quantity'])
+
+    print(f">>>>>>>>> INDEX: {stock}")
+    return render_template("index.html", title="Vignoto - Accounting and Management System", stock=stock)
 
 
 @app.route("/purchase/", methods=["POST", "GET"])
@@ -42,17 +50,34 @@ def purchase():
             "v_quantity": int(form_values["v_quantity"]),
             "v_price": float(form_values["v_price"]),
         }
-        v_name = new_data["v_name"]
-        v_quantity = new_data["v_quantity"]
-        v_price = new_data["v_price"]
-        total_price = v_price
         manager.f_purchase(new_data)
     return render_template("purchase.html", title="PURCHASE")
 
 
-@app.route("/sale/")
+@app.route("/sale/", methods=["POST", "GET"])
 def sale():
-    return render_template("sale.html", title="SALE")
+    success = False
+    data = manager.load_data()
+    stock = data["v_warehouse"]
+    if request.method == "POST":
+        print(f">>>>>>>>>>>>>>>>>>>>>>>REQUEST: {request.form.get}")
+        if request.form.get("s_name"):
+            new_sale = {
+                "s_name": request.form["s_name"],
+                "s_quantity": request.form["s_quantity"]
+            }
+            if int(new_sale["s_quantity"]) > stock[new_sale["s_name"]]["v_quantity"]:
+                print(f"Sorry, you do not have enough {new_sale['s_name']} to sell.\n")
+                success = False
+            else:
+                success = manager.f_sale(new_sale)
+
+            if not success:
+                flash(f"Sorry no more '{new_sale['s_name']}' available!")
+            else:
+                flash(f"Successfully sold '{new_sale['s_quantity']}' items of '{new_sale['s_name']}'")
+
+        return redirect(url_for("index"))
 
 
 @app.route("/balance/")

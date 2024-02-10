@@ -127,6 +127,7 @@ class Manager:
 
         review.append(f"{date_transaction};{transaction_desc};{value}")
         data["v_review"] = review
+        Manager.save_data(self, data)
         return data
 
 
@@ -149,26 +150,38 @@ class Manager:
 
 #    @log_transaction
 #    @validate_quantity
-    def f_sale(self, data, *args, **kwargs):
+    def f_sale(self, new_sale, *args, **kwargs):
+        success = False
+        config_obj = Config()
+        config_obj.create_files()
+        manager = Manager(config_obj)
+        data = Manager.load_data(self)
+        actual_balance = data.get("v_balance", 0)
         v_warehouse = data.get("v_warehouse", {})
 
         if not v_warehouse:
             print("\nYour warehouse is empty, and you cannot make any sales.")
+            success = False
             return data
 
         try:
-            s_name = str(input("Insert the name of the product: "))
+
+            s_name = str(new_sale["s_name"])
             if s_name not in v_warehouse:
                 print(f"Sorry, {s_name} not available in the warehouse.\n")
+                success = False
                 return data
 
-            s_quantity = int(input(f"Insert the quantity of {s_name} to sell: "))
-            if s_quantity > v_warehouse[s_name]["v_quantity"]:
+            v_quantity = int(new_sale["s_quantity"])
+            if v_quantity > v_warehouse[s_name]["v_quantity"]:
                 print(f"Sorry, you do not have enough {s_name} to sell.\n")
+                success = False
+
                 return data
 
-            total_price = v_warehouse[s_name]["v_price"] * s_quantity
-            data = self.add_transaction(data, "sale", total_price, s_name, s_quantity)
+            total_price = v_warehouse[s_name]["v_price"] * v_quantity
+            data = self.add_transaction(data, "sale", total_price, s_name, v_quantity)
+            success = True
         except ValueError:
             print("Sorry, you did not input a valid value.\n")
         return data
@@ -177,33 +190,6 @@ class Manager:
 #    @log_transaction
 #    @validate_quantity
 #    @validate_price
-
-
-    def new_purchase(self, methods=["POST", "GET"]):
-        print("BEFORE")
-        if request.method == "POST":
-            form_values = request.form
-            new_data = {
-                "v_name": str(form_values["v_name"]),
-                "v_quantity": int(form_values["v_quantity"]),
-                "v_price": float(form_values["v_price"]),
-            }
-            v_name = new_data["v_name"]
-            v_quantity = new_data["v_quantity"]
-            v_price = new_data["v_price"]
-            total_price = v_price
-            print(v_name)
-            print(v_quantity)
-            print(v_price)
-
-
-
-        data = self.add_transaction(data,"purchase", total_price, v_name, v_quantity)
-
-
-
-
-
     def f_purchase(self, new_data, *args, **kwargs):
         config_obj = Config()
         config_obj.create_files()
@@ -295,6 +281,10 @@ class Manager:
                 print(f"{date_transaction} - {transaction} - {v_value}")
 
         return data
+
+
+    def all(self):
+        return self.load_data()
 
     def assign(self, option, data):
         """
