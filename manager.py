@@ -109,7 +109,10 @@ class Manager:
 
         if transaction_type == "balance":
             data["v_balance"] += value
-            transaction_desc = f"Balance {value}"
+            transaction_desc = f"Added to account: {value}"
+        elif transaction_type == "withdraw":
+            data["v_balance"] -= value
+            transaction_desc = f"withdraw from account: {value}"
         elif transaction_type == "sale":
             total_price = value
             data["v_balance"] += total_price
@@ -132,14 +135,21 @@ class Manager:
 
 
 #    @log_transaction
-    def f_balance(self, data, *args, **kwargs):
+    def f_balance(self, new_balance, *args, **kwargs):
+        config_obj = Config()
+        config_obj.create_files()
+        manager = Manager(config_obj)
+        data = Manager.load_data(self)
+        actual_balance = data.get("v_balance", 0)
+        v_action = new_balance["v_action"]
+        v_value = new_balance["v_value"]
         try:
-            v_action = int(input("Press '1' to Add or press '2' to Subtract: "))
+            #v_action = int(input("Press '1' to Add or press '2' to Subtract: "))
             if v_action not in {1, 2}:
                 print(f"Sorry {v_action} is not a valid option.\n")
             else:
-                v_value = float(input("Insert the amount to your balance: "))
-                transaction_type = "balance" if v_action == 1 else "withdrawal"
+                #v_value = float(input("Insert the amount to your balance: "))
+                transaction_type = "balance" if v_action == 1 else "withdraw"
                 data = self.add_transaction(data, transaction_type, v_value)
 
         except ValueError:

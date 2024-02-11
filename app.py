@@ -33,16 +33,20 @@ app.config["SECRET_KEY"] = "mySecretKey"
 def index():
     data = manager.load_data()
     stock = data["v_warehouse"]
+    balance = data["v_balance"]
+    print(f"+++++++++++++++++++++++++++++ BALANCE: {balance}")
     # for stock in warehouse:
     #     print(stock)
     #     print(warehouse[stock]['v_quantity'])
 
     print(f">>>>>>>>> INDEX: {stock}")
-    return render_template("index.html", title="Vignoto - Accounting and Management System", stock=stock)
+    return render_template("index.html", title="Vignoto - Accounting and Management System", stock=stock, balance=balance)
 
 
 @app.route("/purchase/", methods=["POST", "GET"])
 def purchase():
+    data = manager.load_data()
+    balance = data["v_balance"]
     if request.method == "POST":
         form_values = request.form
         new_data = {
@@ -51,7 +55,8 @@ def purchase():
             "v_price": float(form_values["v_price"]),
         }
         manager.f_purchase(new_data)
-    return render_template("purchase.html", title="PURCHASE")
+        return redirect(url_for("index"))
+    return render_template("purchase.html", title="PURCHASE", balance=balance)
 
 
 @app.route("/sale/", methods=["POST", "GET"])
@@ -80,13 +85,27 @@ def sale():
         return redirect(url_for("index"))
 
 
-@app.route("/balance/")
+@app.route("/balance/", methods=["POST", "GET"])
 def balance():
-    return render_template("balance.html", title="BALANCE")
+    data = manager.load_data()
+    balance = data["v_balance"]
+    if request.method == "POST":
+        form_values = request.form
+        # if request.form.get("1"):
+        new_balance = {
+            "v_value": float(form_values["v_value"]),
+            "v_action": int(form_values["v_action"]),
+        }
+        print(f"++++++++++++++++++++++++++++++++++++++++++++++++ NEW BALANCE: {new_balance}")
+        manager.f_balance(new_balance)
+        return redirect(url_for("index"))
+    return render_template("balance.html", title="BALANCE", balance=balance)
 
 
 @app.route("/history/")
 def history():
-    return render_template("history.html", title="HISTORY")
+    data = manager.load_data()
+    balance = data["v_balance"]
+    return render_template("history.html", title="HISTORY", balance=balance)
 
 #purchase()
