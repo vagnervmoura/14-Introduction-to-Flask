@@ -15,6 +15,8 @@ from flask import url_for
 from flask import flash
 from manager import Manager
 from config import Config
+from datetime import datetime
+
 
 db = Manager
 warehouse = Manager(name="warehouse_file")
@@ -34,13 +36,8 @@ def index():
     data = manager.load_data()
     stock = data["v_warehouse"]
     balance = data["v_balance"]
-    print(f"+++++++++++++++++++++++++++++ BALANCE: {balance}")
-    # for stock in warehouse:
-    #     print(stock)
-    #     print(warehouse[stock]['v_quantity'])
 
-    print(f">>>>>>>>> INDEX: {stock}")
-    return render_template("index.html", title="Vignoto - Accounting and Management System", stock=stock, balance=balance)
+    return render_template("index.html", title="Current stock level:", stock=stock, balance=balance)
 
 
 @app.route("/purchase/", methods=["POST", "GET"])
@@ -58,14 +55,12 @@ def purchase():
         return redirect(url_for("index"))
     return render_template("purchase.html", title="PURCHASE", balance=balance)
 
-
 @app.route("/sale/", methods=["POST", "GET"])
 def sale():
     success = False
     data = manager.load_data()
     stock = data["v_warehouse"]
     if request.method == "POST":
-        print(f">>>>>>>>>>>>>>>>>>>>>>>REQUEST: {request.form.get}")
         if request.form.get("s_name"):
             new_sale = {
                 "s_name": request.form["s_name"],
@@ -73,14 +68,20 @@ def sale():
             }
             if int(new_sale["s_quantity"]) > stock[new_sale["s_name"]]["v_quantity"]:
                 print(f"Sorry, you do not have enough {new_sale['s_name']} to sell.\n")
-                success = False
+                message = f"Sorry, you do not have enough {new_sale['s_name']} to sell.\n"
+                return render_template("message.html", message=message)
             else:
                 success = manager.f_sale(new_sale)
 
             if not success:
                 flash(f"Sorry no more '{new_sale['s_name']}' available!")
+                message = f"Sorry no more '{new_sale['s_name']}' available!"
+                return render_template("message.html", message=message)
+
             else:
                 flash(f"Successfully sold '{new_sale['s_quantity']}' items of '{new_sale['s_name']}'")
+                message = f"Successfully sold '{new_sale['s_quantity']}' items of '{new_sale['s_name']}'"
+                return render_template("message.html", message=message)
 
         return redirect(url_for("index"))
 
@@ -96,16 +97,56 @@ def balance():
             "v_value": float(form_values["v_value"]),
             "v_action": int(form_values["v_action"]),
         }
-        print(f"++++++++++++++++++++++++++++++++++++++++++++++++ NEW BALANCE: {new_balance}")
         manager.f_balance(new_balance)
         return redirect(url_for("index"))
+
     return render_template("balance.html", title="BALANCE", balance=balance)
 
 
-@app.route("/history/")
+@app.route("/history/", defaults={"line_from": None, "line_to": None})
+@app.route("/history/", methods=["POST", "GET"])
 def history():
     data = manager.load_data()
-    balance = data["v_balance"]
-    return render_template("history.html", title="HISTORY", balance=balance)
+    history = data.get("v_review", [])
+    balance = data.get("v_balance", 0)
 
-#purchase()
+    new_history = {"date_transaction": [], "transaction": [], "v_value": []}
+
+    if request.method == "POST":
+        form_values = request.form
+        filtered_history = []
+        new_data = {
+            "line_from": str(form_values["line_from"]),
+            "line_to": str(form_values["line_to"]),
+        }
+        line_from = new_data["line_from"].replace('-','/')
+
+        if new_data["line_to"] is "":
+            line_to = datetime.today()
+            line_to = line_to.strftime("%Y/%m/%d")
+
+        else:
+            line_to = new_data["line_to"].replace('-','/')
+        line_to = line_to + ' 23:59:59'
+
+        new_history = manager.f_review(history)
+
+        if line_from is "" and line_to is "":
+            filtered_history = new_history
+
+        else:
+            index = 0
+
+            filtered_data = {'date_transaction': [], 'transaction': [], 'v_value': []}
+            for valor in new_history['date_transaction']:
+                index += 1
+                if line_from <= valor <= line_to:
+                    if valor in new_history['date_transaction']:
+                        index = new_history['date_transaction'].index(valor)
+                        filtered_data['date_transaction'].append(new_history['date_transaction'][index])
+                        filtered_data['transaction'].append(new_history['transaction'][index])
+                        filtered_data['v_value'].append(new_history['v_value'][index])
+
+        new_history=filtered_data
+
+    return render_template("history.html", title="HISTORY", history=history, balance=balance, new_history=new_history)

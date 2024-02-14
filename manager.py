@@ -280,17 +280,43 @@ class Manager:
 
         return data
 
-    def f_review(self, data):
-        v_review = data.get("v_review", [])
+    def f_review(self, history):
+        new_history = {"date_transaction": [], "transaction": [], "v_value": []}
 
-        if not v_review:
-            print("\nReview file is empty.\n")
-        else:
-            for row in v_review:
-                date_transaction, transaction, v_value = row.strip().split(";")
-                print(f"{date_transaction} - {transaction} - {v_value}")
+        if history:
+            for entry in history:
+                parts = entry.split(';')
+                date_transaction = parts[0]
+                transaction_description = parts[1]
+                v_value = (parts[2])
 
-        return data
+                new_history["date_transaction"].append(date_transaction)
+                new_history["transaction"].append(transaction_description)
+                new_history["v_value"].append(v_value)
+
+        return new_history
+
+
+
+        # if not v_review:
+        #     print("\nReview file is empty.\n")
+        # else:
+        #
+        #     for entry in history:
+        #         date_transaction, transaction, v_value = entry.strip().split(";")
+        #
+        #         #print(f"========================= DATE: {idx}")
+        #         print(f"========================= DATE: {date_transaction}")
+        #         print(f"================== TRANSACTION: {transaction}")
+        #         print(f"======================== VALUE: {v_value}")
+        #
+        #         #new_history.append(new_history)
+        #         new_history["date_transaction"].append(str(date_transaction))
+        #         new_history["transaction"].append(str(transaction))
+        #         new_history["v_value"].append(str(v_value))
+        # print(f"+++++++++++++++++++++++++HISTORY IN REVIEW: {new_history}")
+
+        return new_history
 
 
     def all(self):

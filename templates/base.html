@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Vignoto - Account and Management System</title>
-    <link href="css/flekristal.css" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 	<link href="currency.js" type="js">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
@@ -15,7 +15,7 @@
 	<style type="text/css">
         body{
             background-color: black;
-            color: #212529;
+            color: white;
             font-size: 14px;
             font-weight: bold;
         }
@@ -34,75 +34,115 @@
         a:disabled {text-decoration: none;
             color: red;
         }
+
+        #fundo {
+          opacity: 0.8;
+          background-color: #000;
+          position: fixed;
+          width: 100%;
+          height: 100%;
+          z-index: 98;
+          top: 0;
+          left: 0;
+          display: none;
+        }
+
+        #modal {
+          width: 150px;
+          height: 150px;
+          left: 50%;
+          top: 50%;
+          margin: -75px 0 0 -75px;
+          position: fixed;
+          background-color: #fff;
+          z-index: 99;
+          display: none;
+        }
 	</style>
 
 
+    <script>
+        function fecharModal()
+        {
+          document.getElementById('fundo').style.display = 'none';
+          document.getElementById('modal').style.display = 'none';
+        }
+
+        window.onload = function abrirModal()
+        {
+          document.getElementById('fundo').style.display = 'block';
+          document.getElementById('modal').style.display = 'block';
+        }
+    </script>
+
+
 </head>
-<body>
-    <!-- *** TOP START *** -->
-    <div style="text-align: center"><br>
-        <h3>Vignoto - Accounting and Management System</h3>
-        <a href="/"><span class="material-symbols-outlined">home</span></a>
-    </div><br>
-    <!-- *** TOP END *** -->
+<body class="bg-dark">
 
-    <table border="1" class="table table-responsive h-100 table-dark">
-        <thead>
-            <tr>
-                <!-- *** MENU START *** -->
-                <th style="width:200px">
-                    <div style="text-align: center" class="position-absolute top-0 start-1">
-                        <p class="fonts">DAILY OPERATIONS:</p>
-                        <div>
-                            <a href="sale"><span class="material-symbols-outlined">shopping_cart_checkout</span> Sale</a> <br>
-                        </div>
-                        <div>
-                            <a href="purchase"><span class="material-symbols-outlined">add_shopping_cart</span> Purchase</a> <br><br><br>
-                        </div>
-                    </div>
+<!-- *** MENU START *** -->
+    <div class="container">
+        <nav class="navbar navbar-expand-lg bg-black bg-body-black navbar-dark border-bottom fixed-top" data-bs-theme="dark" id="sideNav">
+            <a class="navbar-brand js-scroll-trigger" href="/"><span class="material-symbols-outlined">home</span>
+                <div class="hide-desktop container-md"></div>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link js-scroll-trigger" href="purchase">Purchase</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link js-scroll-trigger" href="history">History</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link js-scroll-trigger" href="balance">Balance</a>
+                    </li>
+                </ul>
+                <span class="navbar-text"><span>
+                        <p></p>Current account: € {{ balance }}
+                </span>
+            </div>
+        </nav>
+    </div>
 
-                    <div style="text-align: center" class="position-absolute top-0 end-0">
-                        <p class="fonts">INTERNAL TRANSACTIONS:</p>
-                        <div>
-                            <a href="balance"><span class="material-symbols-outlined">balance</span> Balance</a> <br>
-                        </div>
-                        <div>
-                            <a href="history"><span class="material-symbols-outlined">contract_edit</span> History</a> <br>
-                        </div>
-                    </div>
-
-                    <div style="text-align: center" class="position-absolute bottom-0 start-50">
-                        <div>
-                            <a href="balance">
-                                <span class="material-symbols-outlined">
-                                    balance
-                                </span>
-                            </a>
-                            <p style="text-align: left">Current account balance:</p>
-                            <p style="text-align: center">€ 2,800.00</p>
-                        </div>
-                    </div>
-                <!-- *** MENU END *** -->
+<!-- *** MENU END *** -->
 
 
-                <!-- *** CONTENT START *** -->
-                <th style="width:1000px">
+<!-- *** CONTENT START *** -->
+    <div class="col col-12 container-fluid text-center">
+        <div class="row content">
+            <p></p>
+            <p></p>
+            <p></p>
+            <p></p>
+            <p></p>
+            <div class="col col-12 container-fluid">
+                <div style="text-align: center"  class="col col-6 container-fluid">
+                    <p style="text-align: center">{{ title }}</p>
+                </div>
 
                 {% block content %}
 
+
+
                 {% endblock %}
+            </div>
+            <p></p>
+            <p></p>
+            <p></p>
+	    </div>
+	</div>
+<!-- *** CONTENT END *** -->
 
-                </th>
-                <!-- *** CONTENT END *** -->
-
-            </tr>
-        </thead>
-    </table>
-    <div style="text-align: center" class="position-absolute bottom-0 start-1">
-        <p class="fonts">Designed and Developed by:</p>
+<!-- *** FOOTER START *** -->
+    <footer class="container-fluid text-center fixed-bottom table-group-divider bg-black" style="background:black">
+        Designed and Developed by:
         Vagner Vignoto Moura<br>
-        <span class="material-symbols-outlined">mail</span>
-        <a href="vagner@vignoto.com" TARGET="content">vagner@vignoto.com</a>
-    </div>
+        <span class="material-symbols-outlined">mail</span><a href="mailto:vagner@vignoto.com" TARGET="content">vagner@vignoto.com</a>
+    </footer>
+<!-- *** FOOTER END *** -->
+
 </body>
 </html>
