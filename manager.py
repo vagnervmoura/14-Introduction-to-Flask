@@ -109,24 +109,30 @@ class Manager:
 
         if transaction_type == "balance":
             data["v_balance"] += value
-            transaction_desc = f"Added to account: {value}"
+            transaction_desc = f"Added to account"
         elif transaction_type == "withdraw":
             data["v_balance"] -= value
-            transaction_desc = f"withdraw from account: {value}"
+            transaction_desc = f"Withdraw from account"
         elif transaction_type == "sale":
-            total_price = value
+            total_price = (value * 1.5) * quantity
             data["v_balance"] += total_price
             data["v_warehouse"].setdefault(product_name, {"v_price": value, "v_quantity": quantity})
             data["v_warehouse"][product_name]["v_quantity"] -= quantity
-            transaction_desc = f"Selling {quantity} units of {product_name} for {total_price}"
+            transaction_desc = f"Sold '{quantity}' units of '{product_name}': unit price '{value}'"
+            if data["v_warehouse"][product_name]["v_quantity"] == 0:
+                print(f"Last {data['v_warehouse'][product_name]} sold, deleting from Warehouse.")
+                del data["v_warehouse"][product_name]
             print(transaction_desc)
+            value = total_price
         elif transaction_type == "purchase":
-            total_price = value
+            total_price = value * quantity
             data["v_balance"] -= total_price
             data["v_warehouse"].setdefault(product_name, {"v_price": value, "v_quantity": 0})
             data["v_warehouse"][product_name]["v_quantity"] += quantity
-            transaction_desc = f"Purchasing {quantity} units of {product_name} for {total_price}"
+            transaction_desc = f"Purchase '{quantity}' units of '{product_name}': unit price '{value}'"
             print(transaction_desc)
+            value = total_price
+
 
         review.append(f"{date_transaction};{transaction_desc};{value}")
         data["v_review"] = review
@@ -175,7 +181,6 @@ class Manager:
             return data
 
         try:
-
             s_name = str(new_sale["s_name"])
             if s_name not in v_warehouse:
                 print(f"Sorry, {s_name} not available in the warehouse.\n")
@@ -186,11 +191,10 @@ class Manager:
             if v_quantity > v_warehouse[s_name]["v_quantity"]:
                 print(f"Sorry, you do not have enough {s_name} to sell.\n")
                 success = False
-
                 return data
-
-            total_price = v_warehouse[s_name]["v_price"] * v_quantity
-            data = self.add_transaction(data, "sale", total_price, s_name, v_quantity)
+            v_price = v_warehouse[s_name]["v_price"]
+            total_price = v_price * v_quantity
+            data = self.add_transaction(data, "sale", v_price, s_name, v_quantity)
             success = True
         except ValueError:
             print("Sorry, you did not input a valid value.\n")
@@ -206,35 +210,12 @@ class Manager:
         manager = Manager(config_obj)
         data = Manager.load_data(self)
         actual_balance = data.get("v_balance", 0)
-        print("****************************************TESTE*******************************************************")
         #if actual_balance <= 0:
         #    print("\nYour account is empty, and you cannot make any purchases.")
         #    return data
         #
         #app.purchase()
-        print("BEFORE")
-        print(new_data)
-        v_name = new_data["v_name"]
-        v_quantity = new_data["v_quantity"]
-        v_price = new_data["v_price"]
-        total_price = v_price
-        print(v_name, v_price, v_quantity)
-
-        print(f"====================V_BALANCE: {data['v_balance']}")
-
-
-            # v_name = str(input("Insert the name of product: "))
-            # v_price = float(input(f"Insert the unit price of {v_name}: "))
-            # v_quantity = int(input(f"Insert the quantity of {v_name}: "))
-            #purchase()
-
-            #total_price = v_price
-            #if total_price > actual_balance:
-            #    print(f"Sorry, you do not have a balance enough to make this purchase.\n"
-            #          f"Your actual balance is {actual_balance}.")
-            #else:
-        data = self.add_transaction(data, "purchase", total_price, v_name, v_quantity)
-        print("AFTER")
+        data = self.add_transaction(data, "purchase", new_data["v_price"], new_data["v_name"], new_data["v_quantity"])
         #except ValueError:
         #    print("Sorry, you did not input a valid value.\n")
         print(data)

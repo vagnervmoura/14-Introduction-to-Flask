@@ -51,14 +51,29 @@ def purchase():
             "v_quantity": int(form_values["v_quantity"]),
             "v_price": float(form_values["v_price"]),
         }
-        manager.f_purchase(new_data)
-        return redirect(url_for("index"))
+
+        v_name = new_data["v_name"]
+        v_quantity = new_data["v_quantity"]
+        v_price = new_data["v_price"]
+        total_price = v_price * v_quantity
+
+        if total_price > balance:
+            print(f"Sorry, you do not have a balance enough to make this purchase.\n"
+                  f"Your actual balance is {balance}.")
+            message = f"WARNING: Balance is not enough  enough to make this purchase."
+            return render_template("message.html", message=message, balance=balance)
+        else:
+            manager.f_purchase(new_data)
+            message = f"Purchased '{v_quantity}' '{v_name}'."
+            return render_template("message.html", message=message, balance=balance)
+
     return render_template("purchase.html", title="PURCHASE", balance=balance)
 
 @app.route("/sale/", methods=["POST", "GET"])
 def sale():
     success = False
     data = manager.load_data()
+    balance = data["v_balance"]
     stock = data["v_warehouse"]
     if request.method == "POST":
         if request.form.get("s_name"):
@@ -67,21 +82,21 @@ def sale():
                 "s_quantity": request.form["s_quantity"]
             }
             if int(new_sale["s_quantity"]) > stock[new_sale["s_name"]]["v_quantity"]:
-                print(f"Sorry, you do not have enough {new_sale['s_name']} to sell.\n")
-                message = f"Sorry, you do not have enough {new_sale['s_name']} to sell.\n"
-                return render_template("message.html", message=message)
+                print(f"WARNING: Not enough {new_sale['s_name']} to sell.\n")
+                message = f"WARNING: Not enough '{new_sale['s_name']}' to sell.\n"
+                return render_template("message.html", message=message, balance=balance)
             else:
                 success = manager.f_sale(new_sale)
 
             if not success:
-                flash(f"Sorry no more '{new_sale['s_name']}' available!")
-                message = f"Sorry no more '{new_sale['s_name']}' available!"
-                return render_template("message.html", message=message)
+                # flash(f"Sorry no more '{new_sale['s_name']}' available!")
+                message = f"WARNING: No more '{new_sale['s_name']}' available!"
+                return render_template("message.html", message=message, balance=balance)
 
             else:
-                flash(f"Successfully sold '{new_sale['s_quantity']}' items of '{new_sale['s_name']}'")
+                # flash(f"Successfully sold '{new_sale['s_quantity']}' items of '{new_sale['s_name']}'")
                 message = f"Successfully sold '{new_sale['s_quantity']}' items of '{new_sale['s_name']}'"
-                return render_template("message.html", message=message)
+                return render_template("message.html", message=message, balance=balance)
 
         return redirect(url_for("index"))
 
@@ -97,8 +112,18 @@ def balance():
             "v_value": float(form_values["v_value"]),
             "v_action": int(form_values["v_action"]),
         }
-        manager.f_balance(new_balance)
-        return redirect(url_for("index"))
+
+        if new_balance["v_action"] == 2 and new_balance["v_value"] > balance:
+            message = f"WARNING: Your balance is too low. Maximum amount you can withdraw is: {balance}."
+            return render_template("message.html", message=message, balance=balance)
+        else:
+            manager.f_balance(new_balance)
+            if new_balance["v_action"] == 2:
+                msg = "Withdraw"
+            else:
+                msg = "Added"
+            message = f"{msg} '{new_balance['v_value']}' successfully."
+            return render_template("message.html", message=message, balance=balance)
 
     return render_template("balance.html", title="BALANCE", balance=balance)
 

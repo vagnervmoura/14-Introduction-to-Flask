@@ -40,3 +40,10 @@ for valor in new_history['date_transaction']:
 		print("INTO IF")
 		filtered_history.append(new_history)
 print(f"88888888888888888888888888888888888888 FILTERED: {filtered_history}")
+
+
+
+
+
+TODO:
+ - 
