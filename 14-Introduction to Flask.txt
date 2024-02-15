@@ -45,4 +45,32 @@ print(f"88888888888888888888888888888888888888 FILTERED: {filtered_history}")
 
 
 
-TODO:
+CSS BACKGROUND COLORS:
+bg-primary
+bg-secondary
+bg-success
+bg-info
+bg-warning
+bg-danger
+bg-light
+bg-dark
+bg-black
+bg-white
+bg-body
+bg-transparent
+bg-body-secondary
+bg-body-tertiary
+bg-opacity-10
+bg-opacity-25
+bg-opacity-50
+bg-opacity-75
+bg-opacity-100
+bg-primary-subtle
+bg-secondary-subtle
+bg-success-subtle
+bg-info-subtle
+bg-warning-subtle
+bg-danger-subtle
+bg-light-subtle
+bg-dark-subtle
+bg-gradient
