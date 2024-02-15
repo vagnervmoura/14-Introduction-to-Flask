@@ -73,6 +73,8 @@
           document.getElementById('fundo').style.display = 'block';
           document.getElementById('modal').style.display = 'block';
         }
+
+        document.getElementById("current_date").innerHTML = Date();
     </script>
 
 
@@ -101,7 +103,8 @@
                     </li>
                 </ul>
                 <span class="navbar-text"><span>
-                        <p></p>Current account: € {{ balance }}
+                        <div class="container-fluid text-left">User: {{ user }}</div>
+                    <div class="container-fluid text-left">Current account: € {{ balance }}</div>
                 </span>
             </div>
         </nav>
@@ -138,6 +141,7 @@
 
 <!-- *** FOOTER START *** -->
     <footer class="container-fluid text-center fixed-bottom table-group-divider bg-black" style="background:black">
+
         Designed and Developed by:
         Vagner Vignoto Moura<br>
         <span class="material-symbols-outlined">mail</span><a href="mailto:vagner@vignoto.com" TARGET="content">vagner@vignoto.com</a>

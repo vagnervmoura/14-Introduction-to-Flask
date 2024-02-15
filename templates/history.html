@@ -27,7 +27,8 @@
                 <table class="table table-dark table-sm" style="text-align: center" >
                     <thead>
                         <tr>
-                           <th>DATE</th>
+                            <th>DATE</th>
+                            <th>USER</th>
                             <th>ACTION</th>
                             <th>VALUE</th>
                         </tr>
@@ -36,6 +37,7 @@
                         {% for i in range(new_history['date_transaction']|length) %}
                             <tr>
                                 <td>{{ new_history['date_transaction'][i] }}</td>
+                                <td>{{ new_history['user'][i] }}</td>
                                 <td>{{ new_history['transaction'][i] }}</td>
                                 <td>{{ new_history['v_value'][i] }}</td>
                             </tr>

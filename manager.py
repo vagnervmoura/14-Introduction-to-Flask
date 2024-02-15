@@ -103,16 +103,19 @@ class Manager:
         save_file(self.warehouse_file, data["v_warehouse"])
         save_file(self.review_file, data["v_review"])
 
-    def add_transaction(self, data, transaction_type, value, product_name="", quantity=0):
+    def add_transaction(self, user, data, transaction_type, value, product_name="", quantity=0):
+        user = user
         review = data.get("v_review", [])
         date_transaction = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
 
         if transaction_type == "balance":
             data["v_balance"] += value
             transaction_desc = f"Added to account"
+
         elif transaction_type == "withdraw":
             data["v_balance"] -= value
             transaction_desc = f"Withdraw from account"
+
         elif transaction_type == "sale":
             total_price = (value * 1.5) * quantity
             data["v_balance"] += total_price
@@ -124,6 +127,7 @@ class Manager:
                 del data["v_warehouse"][product_name]
             print(transaction_desc)
             value = total_price
+
         elif transaction_type == "purchase":
             total_price = value * quantity
             data["v_balance"] -= total_price
@@ -134,7 +138,7 @@ class Manager:
             value = total_price
 
 
-        review.append(f"{date_transaction};{transaction_desc};{value}")
+        review.append(f"{date_transaction};{user};{transaction_desc};{value}")
         data["v_review"] = review
         Manager.save_data(self, data)
         return data
@@ -149,6 +153,7 @@ class Manager:
         actual_balance = data.get("v_balance", 0)
         v_action = new_balance["v_action"]
         v_value = new_balance["v_value"]
+        user = new_balance["user"]
         try:
             #v_action = int(input("Press '1' to Add or press '2' to Subtract: "))
             if v_action not in {1, 2}:
@@ -156,7 +161,7 @@ class Manager:
             else:
                 #v_value = float(input("Insert the amount to your balance: "))
                 transaction_type = "balance" if v_action == 1 else "withdraw"
-                data = self.add_transaction(data, transaction_type, v_value)
+                data = self.add_transaction(user, data, transaction_type, v_value)
 
         except ValueError:
             print("Sorry, you did not input a valid value.\n")
@@ -172,6 +177,7 @@ class Manager:
         config_obj.create_files()
         manager = Manager(config_obj)
         data = Manager.load_data(self)
+        user = new_sale["user"]
         actual_balance = data.get("v_balance", 0)
         v_warehouse = data.get("v_warehouse", {})
 
@@ -194,7 +200,7 @@ class Manager:
                 return data
             v_price = v_warehouse[s_name]["v_price"]
             total_price = v_price * v_quantity
-            data = self.add_transaction(data, "sale", v_price, s_name, v_quantity)
+            data = self.add_transaction(user, data, "sale", v_price, s_name, v_quantity)
             success = True
         except ValueError:
             print("Sorry, you did not input a valid value.\n")
@@ -210,12 +216,13 @@ class Manager:
         manager = Manager(config_obj)
         data = Manager.load_data(self)
         actual_balance = data.get("v_balance", 0)
+        user = new_data["user"]
         #if actual_balance <= 0:
         #    print("\nYour account is empty, and you cannot make any purchases.")
         #    return data
         #
         #app.purchase()
-        data = self.add_transaction(data, "purchase", new_data["v_price"], new_data["v_name"], new_data["v_quantity"])
+        data = self.add_transaction(user, data, "purchase", new_data["v_price"], new_data["v_name"], new_data["v_quantity"])
         #except ValueError:
         #    print("Sorry, you did not input a valid value.\n")
         print(data)
@@ -262,16 +269,18 @@ class Manager:
         return data
 
     def f_review(self, history):
-        new_history = {"date_transaction": [], "transaction": [], "v_value": []}
+        new_history = {"date_transaction": [], "user": [], "transaction": [], "v_value": []}
 
         if history:
             for entry in history:
                 parts = entry.split(';')
                 date_transaction = parts[0]
-                transaction_description = parts[1]
-                v_value = (parts[2])
+                user = parts[1]
+                transaction_description = parts[2]
+                v_value = (parts[3])
 
                 new_history["date_transaction"].append(date_transaction)
+                new_history["user"].append(user)
                 new_history["transaction"].append(transaction_description)
                 new_history["v_value"].append(v_value)
 
@@ -297,7 +306,7 @@ class Manager:
         #         new_history["v_value"].append(str(v_value))
         # print(f"+++++++++++++++++++++++++HISTORY IN REVIEW: {new_history}")
 
-        return new_history
+        #return new_history
 
 
     def all(self):
