@@ -12,7 +12,6 @@ from flask import render_template
 from flask import request
 from flask import redirect
 from flask import url_for
-from flask import flash
 from manager import Manager
 from config import Config
 from datetime import datetime
@@ -187,3 +186,8 @@ def history():
         new_history=filtered_data
 
     return render_template("history.html", title="HISTORY", history=history, balance=balance, new_history=new_history, user=user)
+
+
+# upload website on-line
+if __name__ == "__main__":
+    app.run(debug=True)
